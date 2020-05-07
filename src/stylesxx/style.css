@@ -1,0 +1,31 @@
+
+.about_team img,iframe {
+    width: 100%;
+    height: auto;
+}
+
+.defail-team img{
+    max-width: 100%;
+    height: auto
+    
+}
+.view_post {
+    max-width: 50%;
+    height: auto
+}
+.reason_comment
+{
+    width: 100%;
+    height: auto
+}
+.event-new img{
+    max-width: 100%;
+    height: auto
+}
+
+.word-break {
+    word-break: break-all;
+}
+.box-shadow {
+    box-shadow: 1px 1px 1px 1px;
+}
