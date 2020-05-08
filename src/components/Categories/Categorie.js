@@ -100,7 +100,7 @@ class Categorie extends Component {
                     <td>
                         {/* <Link className="btn btn-sm btn-info mr-2 command-edit" to={`/categorie/${item.id_categorie}`}><i className="fa fa-eye"></i></Link> */}
                         <Link className="btn btn-sm btn-success mr-2 command-edit" to={`/categories-edit/${item.id_categorie}`}><i className="fa fa-pencil"></i></Link>
-                        {item.id_categorie == 10 || item.id_categorie == 11 ? '' : <button className="btn btn-sm btn-danger mr-2 command-edit" onClick={() => this.onDeleteCategorie(item.id_categorie)}><em className="fa fa-trash fa-fw"></em></button>
+                        {item.CATEGORIES == 1 || item.OPERATION == 1 ? '' : <button className="btn btn-sm btn-danger mr-2 command-edit" onClick={() => this.onDeleteCategorie(item.id_categorie)}><em className="fa fa-trash fa-fw"></em></button>
                         }
                     </td>
                 </tr>

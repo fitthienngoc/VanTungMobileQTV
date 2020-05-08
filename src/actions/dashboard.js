@@ -9,8 +9,10 @@ export const actLoadDataDashboard = () => {
         dispatch({
             type: Types.LOAD_DASHBOARD_REQUEST,
         });
-        return HTTP('dashboard', 'GET', null, header).then(res => {
-            if(res && res.data.status==200){
+        return HTTP('?action=Q_getDashboard', 'GET', null, header).then(res => {
+            // console.log(res);
+            
+            if(res && res.data && res.data.status==200){
                 dispatch({
                     type: Types.LOAD_DASHBOARD_SUCCESS,
                     data : res.data.data

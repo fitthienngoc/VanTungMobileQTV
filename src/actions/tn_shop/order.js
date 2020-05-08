@@ -57,11 +57,11 @@ export const actDeleteOrder = (Id) => {
 }
 
 
-export const actLoadDataOrder = () => {
+export const actLoadDataOrder = (search = '') => {
     var header = authHeader();
     return dispatch => {
         dispatch({ type: Types.LOAD_DATA_ORDERS_REQUEST });
-        return HTTP(`?action=Q_getOrders`, 'GET', null, header).then(res => {
+        return HTTP(`?action=Q_getOrders`+ search, 'GET', null, header).then(res => {
             console.log(res);
 
             if (res && res.data && res.data.status == 200) {

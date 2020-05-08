@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { actLoadDataDashboard, actLoadDataDashboardChartEvents } from '../../actions/dashboard';
 import MorrisChart from './../Charts/Morris';
 import FlotChart from './../Charts/Flot';
+import { URL_WEB } from '../../constants/Config';
 
 
 
@@ -17,7 +18,7 @@ class SingleView extends Component {
 
         dropdownOpen: false,
         activeTab: 'order',
-        activeTab2: 'events',
+        activeTab2: 'order',
         payments: [],
         users: [],
         events: [],
@@ -35,12 +36,12 @@ class SingleView extends Component {
             }
         },
 
-        donutdata: [
-            { label: "finishedEvents", value: 12 },
-            { label: "nowEvents", value: 30 },
-            { label: "commingSoonEvents", value: 20 },
-            { label: "cancelEvents", value: 20 }
-        ],
+        // donutdata: [
+        //     { label: "Chờ xử lý", value: 12 },
+        //     { label: "Đang vận chuyển", value: 30 },
+        //     { label: "Hủy", value: 20 },
+        //     { label: "Hoàn thành", value: 20 }
+        // ],
         donutOptions: {
             element: 'morris-donut',
             colors: ['#f05050', '#fad732', '#ff902b', '#79ceff'],
@@ -50,19 +51,19 @@ class SingleView extends Component {
         chartPie: {
 
             data: [{
-                "label": "finishedEvents",
+                "label": "Chờ xử lý",
                 "color": "#4acab4",
                 "data": 30
             }, {
-                "label": "nowEvents",
+                "label": "Đang vận chuyển",
                 "color": "#ffea88",
                 "data": 40
             }, {
-                "label": "commingSoonEvents",
+                "label": "Hủy",
                 "color": "#ff8153",
                 "data": 90
             }, {
-                "label": "cancelEvents",
+                "label": "Hoàn thành",
                 "color": "#878bb6",
                 "data": 75
             }],
@@ -119,7 +120,7 @@ class SingleView extends Component {
 
     }
     componentDidMount() {
-        // this.props.onLoadData()
+        this.props.onLoadData()
         // this.props.onLoadDataChartEvents()
 
     }
@@ -136,44 +137,31 @@ class SingleView extends Component {
     componentWillReceiveProps(nextprops) {
         if (this.props !== nextprops) {
             if (nextprops.dashboard && nextprops.dashboard.data) {
-                let { payments, users, events, teams, refundRequest, reports, cancelEvents } = nextprops.dashboard.data
-
-                this.setState({
-                    payments, users, events, teams, refundRequest, reports, cancelEvents,
-                })
-            }
-
-
-            if (nextprops.dashboard && nextprops.dashboard.dataChartEvents) {
-                let events_ = nextprops.dashboard.dataChartEvents.events
-
-                if (events_) {
-                    let donutdata = [
-                        { label: "Finished Events", value: events_.finishedEvents },
-                        { label: "Now Events", value: events_.nowEvents },
-                        { label: "Comming Soon Events", value: events_.commingSoonEvents },
-                        { label: "Canceled Events", value: events_.cancelEvents }
-                    ]
+                let {orderData} = nextprops.dashboard.data
+                console.log('orderData',orderData);
+                
+                if (orderData) {
+                    
                     let dataPie = this.state.chartPie
-                    dataPie.data = [{
-                        "label": "Finished Events",
+                    dataPie.data= [{
+                        "label": "Chờ xử lý",
                         "color": "#4acab4",
-                        "data": events_.finishedEvents
+                        "data": orderData.wating_order
                     }, {
-                        "label": "Now Events",
+                        "label": "Đang vận chuyển",
                         "color": "#ffea88",
-                        "data": events_.nowEvents
+                        "data": orderData.shipping_order
                     }, {
-                        "label": "Comming Soon Events",
+                        "label": "Hủy",
                         "color": "#ff8153",
-                        "data": events_.commingSoonEvents
+                        "data": orderData.cancled_order
                     }, {
-                        "label": "Canceled Events",
+                        "label": "Hoàn thành",
                         "color": "#878bb6",
-                        "data": events_.cancelEvents
+                        "data": orderData.finished_order
                     }]
+
                     this.setState({
-                        donutdata,
                         chartPie: dataPie
                     })
                 }
@@ -215,8 +203,8 @@ class SingleView extends Component {
             r = list.map((item, index) => {
                 return <div key={index} className="list-group mb0">
                     <div className="list-group-item bt0">
-                        <span className="badge badge-purple float-right">{item.CreatedAt}</span>
-                        <em className="fa-fw fas fa-calendar-alt mr-2"></em>{item.Name.substr(0, 50)}
+                        <span className="badge badge-purple float-right">{item.phone}</span>
+                        <em className="fa-fw fas fa-calendar-alt mr-2"></em>{item.name} |  {item.email}
                     </div>
                 </div>
             });
@@ -233,8 +221,8 @@ class SingleView extends Component {
 
                 return <div key={index} className="list-group mb0">
                     <div className="list-group-item bt0">
-                        <span className="badge badge-purple float-right">{item.CreatedAt}</span>
-                        <em className="fa-fw fas fa-calendar-alt mr-2"></em><Link to={`/event/${item.Id}/view`}>{item.Title.substr(0, 50)}</Link>
+                        <span className="badge badge-purple float-right">{item.dataBill.time}</span>
+                        <em className="fa-fw fas fa-calendar-alt mr-2"></em><a target="_blank" href={`${URL_WEB}/chi-tiet-hoa-don/${item.Id}`}>{item.dataBill.fullName} / {item.dataBill.address} / {item.dataBill.phone} / {item.dataBill.dataProduct[0].name.substr(0, 50)}</a>
                     </div>
                 </div>
 
@@ -323,10 +311,10 @@ class SingleView extends Component {
             r = list.map((item, index) => {
                 return <tr key={index}>
                     <td>
-                        {item.Title.substr(0, 50)}
+                        {item.fullName.substr(0, 50)}
                     </td>
-                    <td>{item.HostTeam.Name}</td>
-                    <td>{item.CreatedAt}</td>
+                    <td><Link to={`/comments-edit/${item.id_product}/${item.Id}`}>{item.rating} <span className="fa fa-star"></span> | {item.content}</Link></td>
+                    <td>{item.time}</td>
                 </tr>
             });
 
@@ -338,7 +326,7 @@ class SingleView extends Component {
 
     render() {
         console.log('this.props', this.state)
-        var { loadding, loaddingChartEvents } = this.props.dashboard
+        var { loadding, loaddingChartEvents, data } = this.props.dashboard
         var { payments, users, events, teams, refundRequest, reports, cancelEvents, recent10Events } = this.state
         return (
             <ContentWrapper>
@@ -374,10 +362,10 @@ class SingleView extends Component {
                                 {loadding ? this.loadding() :
 
                                     <div className="h2 mt-0">
-                                        {events && events.finishedEvents ? events.finishedEvents : ''}
+                                        {data && data.wating_order ? data.wating_order : ''}
                                     </div>
                                 }
-                                <div className="text-uppercase">Finished Event</div>
+                                <div className="text-uppercase">Đơn hàng chờ xử lý</div>
                             </div>
                         </div>
                     </Col>
@@ -390,10 +378,26 @@ class SingleView extends Component {
                             <div className="col-8 py-3 bg-green rounded-right">
                                 {loadding ? this.loadding() :
 
-                                    <div className="h2 mt-0">{events ? events.unFinishedEvents : ''}</div>
+                                    <div className="h2 mt-0">{data && data.finished_order ? data.finished_order : ''}</div>
                                 }
 
-                                <div className="text-uppercase">Not Finished Event</div>
+                                <div className="text-uppercase">Đơn hàng hoàn thành</div>
+                            </div>
+                        </div>
+                    </Col>
+                    <Col xl={3} lg={6} md={12}>
+                        { /* START card */}
+                        <div className="card flex-row align-items-center align-items-stretch border-0">
+                            <div className="col-4 d-flex align-items-center bg-info justify-content-center rounded-left">
+                                <em className="fa fa-comment fa-3x"></em>
+                            </div>
+                            <div className="col-8 py-3 bg-info rounded-right">
+                                {loadding ? this.loadding() :
+
+                                    <div className="h2 mt-0">{data && data.wating_comment ? data.wating_comment : ''}</div>
+                                }
+
+                                <div className="text-uppercase">Bình luận cần kiểm duyệt</div>
                             </div>
                         </div>
                     </Col>
@@ -411,83 +415,71 @@ class SingleView extends Component {
                         </Card>
                     </Col>
                     <Col lg={8}>
-                        <Card>
-                            <CardHeader>Sales Refund </CardHeader>
 
-                            <CardBody>
-                                <MorrisChart id="morris-line" type={'Line'} data={this.state.chartdataLine} options={this.state.lineOptions} />
-                            </CardBody>
-                        </Card>
-                    </Col>
-
-                </Row>
-                { /* END cards box */}
-                <Row>
-                    <Col lg={6}>
 
                         <div className="card card-transparent">
                             <Nav tabs justified>
                                 <NavItem>
-                                    <NavLink className={this.state.activeTab2 === 'events' ? 'active' : ''}
-                                        onClick={() => { this.toggleTab2('events'); }}
+                                    <NavLink className={this.state.activeTab2 === 'order' ? 'active' : ''}
+                                        onClick={() => { this.toggleTab2('order'); }}
                                     >
-                                        <em className="far fa-clock fa-fw"></em>Recent 10 registered Events
-                                    </NavLink>
+                                        <em className="far fa-clock fa-fw"></em>Đơn Hàng Mới
+                                </NavLink>
                                 </NavItem>
 
                                 <NavItem>
-                                    <NavLink className={this.state.activeTab2 === 'teams' ? 'active' : ''}
-                                        onClick={() => { this.toggleTab2('teams'); }}
+                                    <NavLink className={this.state.activeTab2 === 'user' ? 'active' : ''}
+                                        onClick={() => { this.toggleTab2('user'); }}
                                     >
-                                        <em className="far fa-money-bill-alt fa-fw"></em>10 Registered Teams
-                                    </NavLink>
+                                        <em className="far fa-money-bill-alt fa-fw"></em>Người Dùng Mới
+                                </NavLink>
                                 </NavItem>
 
                                 <NavItem>
-                                    <NavLink className={this.state.activeTab2 === 'cancelEvents' ? 'active' : ''}
-                                        onClick={() => { this.toggleTab2('cancelEvents'); }}
+                                    <NavLink className={this.state.activeTab2 === 'comment' ? 'active' : ''}
+                                        onClick={() => { this.toggleTab2('comment'); }}
                                     >
-                                        <em className="far fa-money-bill-alt fa-fw"></em>10 Canceled Events
-                                    </NavLink>
+                                        <em className="far fa-money-bill-alt fa-fw"></em>Bình Luận/ Đánh Giá Mới
+                                </NavLink>
                                 </NavItem>
                             </Nav>
                             <TabContent activeTab={this.state.activeTab2} className="bg-white p-0">
-                                <TabPane tabId="events">
+                                <TabPane tabId="order">
                                     {/* START table responsive */}
                                     {loadding ? this.loadding() :
-                                        events && events.recent10Events ? this.showRecentEvent(events.recent10Events) : null
+                                        data && data.recent_order ? this.showRecentEvent(data.recent_order) : null
                                     }
                                     {/* END table responsive */}
                                     {/* <div className="card-footer text-right">
-                                        <Link className="btn btn-secondary btn-sm" to="/event">View All Events</Link>
-                                    </div> */}
+                <Link className="btn btn-secondary btn-sm" to="/event">View All Events</Link>
+            </div> */}
                                 </TabPane>
-                                <TabPane tabId="teams">
+                                <TabPane tabId="user">
                                     {/* START table responsive */}
                                     {loadding ? this.loadding() :
-                                        this.showRecentTeam(teams)
+                                        data && data.recent_user && this.showRecentTeam(data.recent_user)
 
 
                                     }
 
                                     {/* END table responsive */}
                                     {/* <div className="card-footer text-right">
-                                        <a className="btn btn-secondary btn-sm" href="">View All Transactions</a>
-                                    </div> */}
+                <a className="btn btn-secondary btn-sm" href="">View All Transactions</a>
+            </div> */}
                                 </TabPane>
-                                <TabPane tabId="cancelEvents">
+                                <TabPane tabId="comment">
                                     {/* START table responsive */}
                                     {loadding ? this.loadding() : <div className="table-responsive">
                                         <table className="table table-bordered table-hover table-striped">
                                             <thead>
                                                 <tr>
-                                                    <th>Event</th>
-                                                    <th>Host Team</th>
-                                                    <th>Created At</th>
+                                                    <th>Khách Hàng</th>
+                                                    <th>Đánh Giá/ Comment</th>
+                                                    <th>Thời Gian</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {this.showRecentCancelEvents(cancelEvents)}
+                                                {data && data.recent_comment && this.showRecentCancelEvents(data.recent_comment)}
 
                                             </tbody>
                                         </table>
@@ -496,8 +488,8 @@ class SingleView extends Component {
 
                                     {/* END table responsive */}
                                     {/* <div className="card-footer text-right">
-                                        <a className="btn btn-secondary btn-sm" href="">View All Transactions</a>
-                                    </div> */}
+                <a className="btn btn-secondary btn-sm" href="">View All Transactions</a>
+            </div> */}
                                 </TabPane>
                             </TabContent>
                         </div>
@@ -507,144 +499,9 @@ class SingleView extends Component {
                         { /* END panel tab */}
                     </Col>
 
-                    <Col lg={6}>
-                        <div className="card card-transparent">
-                            <Nav tabs justified>
 
-                                <NavItem>
-                                    <NavLink className={this.state.activeTab === 'order' ? 'active' : ''}
-                                        onClick={() => { this.toggleTab('order'); }}
-                                    >
-                                        <em className="far fa-money-bill-alt fa-fw"></em>10 Oders
-                                    </NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink className={this.state.activeTab === 'sign up' ? 'active' : ''}
-                                        onClick={() => { this.toggleTab('sign up'); }}
-                                    >
-                                        <em className="far fa-money-bill-alt fa-fw"></em>10 Sign up
-                                    </NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink className={this.state.activeTab === 'sign in' ? 'active' : ''}
-                                        onClick={() => { this.toggleTab('sign in'); }}
-                                    >
-                                        <em className="far fa-money-bill-alt fa-fw"></em>10 Sign in
-                                    </NavLink>
-                                </NavItem>
-
-                                <NavItem>
-                                    <NavLink className={this.state.activeTab === 'reports' ? 'active' : ''}
-                                        onClick={() => { this.toggleTab('reports'); }}
-                                    >
-                                        <em className="far fa-money-bill-alt fa-fw"></em>10 Reports
-                                    </NavLink>
-                                </NavItem>
-                            </Nav>
-                            <TabContent activeTab={this.state.activeTab} className="bg-white p-0">
-                                <TabPane tabId="order">
-                                    {/* START table responsive */}
-                                    {loadding ? this.loadding() :
-                                        <div className="table-responsive">
-                                            <table className="table table-bordered table-hover table-striped">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Event</th>
-                                                        <th>User</th>
-                                                        <th>Quantity</th>
-                                                        <th>Order Time</th>
-                                                        <th>Amount (USD)</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {payments ? this.showRecentOder(payments) : null}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    }
-
-                                    {/* END table responsive */}
-                                    {/* <div className="card-footer text-right">
-                                        <Link className="btn btn-secondary btn-sm" to="/payment">View All Oders</Link>
-                                    </div> */}
-                                </TabPane>
-                                <TabPane tabId="sign up">
-                                    {/* START table responsive */}
-                                    {loadding ? this.loadding() : <div className="table-responsive">
-                                        <table className="table table-bordered table-hover table-striped">
-                                            <thead>
-                                                <tr>
-                                                    <th>User</th>
-                                                    <th>Email</th>
-                                                    <th>Sign Up Time</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {users && users.signUpUsers ? this.showRecentSignUp(users.signUpUsers) : ''}
-
-                                            </tbody>
-                                        </table>
-                                    </div>}
-
-                                    {/* END table responsive */}
-                                    {/* <div className="card-footer text-right">
-                                        <a className="btn btn-secondary btn-sm" href="">View All Transactions</a>
-                                    </div> */}
-                                </TabPane>
-                                <TabPane tabId="sign in">
-                                    {/* START table responsive */}
-                                    {loadding ? this.loadding() : <div className="table-responsive">
-                                        <table className="table table-bordered table-hover table-striped">
-                                            <thead>
-                                                <tr>
-                                                    <th>User</th>
-                                                    <th>Email</th>
-                                                    <th>Sign In Time</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {users && this.showRecentSignIn(users.signInUsers)}
-
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    }
-
-                                    {/* END table responsive */}
-                                    {/* <div className="card-footer text-right">
-                                        <a className="btn btn-secondary btn-sm" href="">View All Transactions</a>
-                                    </div> */}
-                                </TabPane>
-                                <TabPane tabId="reports">
-                                    {/* START table responsive */}
-                                    {loadding ? this.loadding() : <div className="table-responsive">
-                                        <table className="table table-bordered table-hover table-striped">
-                                            <thead>
-                                                <tr>
-                                                    <th>TargetType</th>
-                                                    <th>Content</th>
-                                                    <th>CreatedAt</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {this.showRecentReport(reports)}
-
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    }
-
-                                    {/* END table responsive */}
-                                    {/* <div className="card-footer text-right">
-                                        <a className="btn btn-secondary btn-sm" href="">View All Transactions</a>
-                                    </div> */}
-                                </TabPane>
-                            </TabContent>
-                        </div>
-                    </Col>
 
                 </Row>
-
 
             </ContentWrapper>
         );
