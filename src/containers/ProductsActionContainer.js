@@ -114,7 +114,7 @@ class ProductsActionContainer extends Component {
     };
 
     componentDidMount() {
-        this.props.onLoadDataCategories()
+        this.props.onLoadDataCategories('',100)
         this.props.onClearCategory()
         if (this.props.match && this.props.match.params && this.props.match.params.id) {
             this.props.onEditItem(this.props.match.params.id)
@@ -1220,8 +1220,8 @@ const mapDispatchToProps = (dispatch, props) => {
             dispatch(actUpdateProduct(body))
         },
 
-        onLoadDataCategories: () => {
-            dispatch(actLoadDataCategories())
+        onLoadDataCategories: (search,limit) => {
+            dispatch(actLoadDataCategories(search,limit))
         },
 
     }

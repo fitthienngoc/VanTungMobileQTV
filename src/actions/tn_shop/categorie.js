@@ -3,11 +3,11 @@ import HTTP from '../../services/HTTP';
 import history from '../../helpers/history';
 import authHeader from '../../helpers/authHeader';
 
-export const actLoadDataCategories = (search = '') => {
+export const actLoadDataCategories = (search = '', limit) => {
     var header = authHeader();
     return dispatch => {
         dispatch({ type: Types.LOAD_DATA_CATEGORIES_REQUEST });
-        return HTTP('?action=categories' + search, 'GET', null, header).then(res => {
+        return HTTP('?action=categories' + search + '&limit=' + limit, 'GET', null, header).then(res => {
             console.log(`res`, res);
 
             if (res && res.data && res.data.status == 200) {
@@ -47,7 +47,7 @@ export const actGetCategorie = (id) => {
 
 export const actUpdateCategorie = (body) => {
     console.log(`body`, body);
-    
+
     var header = authHeader();
     return dispatch => {
         dispatch({ type: Types.UPDATE_CATEGORIE_REQUEST });
@@ -114,7 +114,7 @@ export const actCropImg = (boolean) => {
 }
 
 export const actCropImgSuccess = (url) => {
-    
+
     return {
         type: Types.URL_CROP_IMG_BANNER,
         url
